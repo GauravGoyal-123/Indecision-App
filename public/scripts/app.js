@@ -196,7 +196,7 @@ var AddOptions = function (_React$Component2) {
                     React.createElement(
                         "button",
                         null,
-                        "Add the option"
+                        "Add option"
                     )
                 )
             );
