@@ -5,7 +5,7 @@ class Counter extends React.Component {
         this.handleMinus = this.handleMinus.bind(this);
         this.handleReset = this.handleReset.bind(this);
         this.state = {
-            count : 0
+            count : props.count
         }
     }
     handlePlus() {
@@ -17,7 +17,10 @@ class Counter extends React.Component {
         });
 
     }
-    handleMinus() {
+    handleMinus(cnt) {
+        if(!this.state.count) {
+            return "Count can't be -ve";
+        }
         this.setState((prevState) => {
             return {
                 count : prevState.count - 1
@@ -27,7 +30,7 @@ class Counter extends React.Component {
         
     }
     handleReset () {
-        this.setState((prevState) => {
+        this.setState(() => {
             return {
                 count : 0
             }
@@ -38,11 +41,47 @@ class Counter extends React.Component {
             <div>
                 <h1>Count : {this.state.count}</h1>
                 <button onClick = {this.handlePlus}>+1</button>
-                <button onClick = {this.handleMinus}>-1</button>
+                <DecCount handleMinus = {this.handleMinus} cnt = {this.state.count}/>
                 <button onClick = {this.handleReset}>reset</button>
             </div>
         );
     }
+}
+
+Counter.defaultProps = {
+    count : 0
+}
+
+class DecCount extends React.Component {
+    constructor(props) {
+        super(props);
+        this.xyz = this.xyz.bind(this);
+        this.state = {
+            err : undefined
+        };
+    }
+    xyz() {
+        const err = this.props.handleMinus(this.props.cnt);
+        
+        this.setState(()=>{
+            return {
+                err : err
+            }
+        })
+        
+    }
+
+    render (){
+        return (
+            <div>
+                
+                <button onClick = {this.xyz}>-1</button>
+                {this.state.err && <p>{this.state.err}</p>}
+            </div>
+        );
+    }
+    
+    
 }
 
 ReactDOM.render(<Counter/>, document.getElementById('app'));
