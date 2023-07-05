@@ -11,6 +11,31 @@ class IndecisionApp extends React.Component {
             options : props.options
         }
     }
+
+    componentDidMount() {
+        try{
+            const json = localStorage.getItem('options');
+            const options = JSON.parse(json);
+            if(options) {
+                this.setState(()=>({options}))
+            }
+        }
+        catch(e) {
+
+        }      
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        if(prevState.options.length !== this.state.options.length) {
+            const json = JSON.stringify(this.state.options);
+            localStorage.setItem('options', json);
+        }
+    }
+
+    componentDidUnmount() {
+        
+    }
+
     handleDeleteOptions() {
         this.setState(() => ({options : []}));
     }
@@ -45,7 +70,7 @@ class IndecisionApp extends React.Component {
         return (
             <div>
                 <Header title = {title} />
-                <Action handlePick = {this.handlePick} />
+                <Action handlePick = {this.handlePick} options = {this.state.options}/>
                 <Options options = {this.state.options} handleDeleteOptions = {this.handleDeleteOptions} handleDeleteOption = {this.handleDeleteOption} />
                 <AddOptions handleAddOptions = {this.handleAddOptions} />
                 
@@ -63,7 +88,7 @@ IndecisionApp.defaultProps = {
 const Action = (props) => {
     return (
         <div>
-            <button onClick = {props.handlePick}>What Should I do?</button>
+            <button onClick = {props.handlePick} disabled = {props.options.length > 0 ? false : true}>What Should I do?</button>
         </div>
     );
 }
@@ -80,7 +105,7 @@ const Options = (props) => {
     return (
         <div>
             <button onClick = {props.handleDeleteOptions}>Remove All</button>  
-            <p>Option Components here!</p>
+            {props.options.length === 0 && <p>Add options</p>} 
             {props.options.map((option) => <Option key = {option} val = {option} handleDeleteOption = {props.handleDeleteOption} />)}
         </div>
     );
@@ -109,10 +134,12 @@ class AddOptions extends React.Component {
     OnSubmitFunction(e) {
         e.preventDefault();
         const value = e.target.elements.addoptions.value.trim();
-        e.target.elements.addoptions.value = '';
         const err = this.props.handleAddOptions(value);
         
         this.setState(() =>  ({error : err}));
+        if(!err) {
+            e.target.elements.addoptions.value = '';
+        } 
         
     }
     render() {
